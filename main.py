@@ -24,7 +24,7 @@ async def main():
             filters.TEXT
             & ~filters.COMMAND
             & ~filters.Chat(
-                chat_id=[TELEGRAM_SUPPORT_CHAT_ID, PERSONAL_ACCOUNT_CHAT_ID]
+                chat_id=[TELEGRAM_SUPPORT_CHAT_ID] # , PERSONAL_ACCOUNT_CHAT_ID
             ),
             forward_to_group,
         )
@@ -32,7 +32,7 @@ async def main():
     application.add_handler(
         MessageHandler(
             filters.TEXT
-            & filters.Chat(chat_id=[TELEGRAM_SUPPORT_CHAT_ID, PERSONAL_ACCOUNT_CHAT_ID])
+            & filters.Chat(chat_id=[TELEGRAM_SUPPORT_CHAT_ID]) # , PERSONAL_ACCOUNT_CHAT_ID
             & filters.REPLY,
             forward_to_user,
         )
@@ -67,4 +67,5 @@ async def shutdown(application: Application):
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    #asyncio.run(main())
+    asyncio.get_event_loop().run_until_complete(main()) # For old Python, like 3.8.10

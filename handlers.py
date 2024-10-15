@@ -12,7 +12,7 @@ import logging
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Send a welcome message when the command /start is issued."""
     await update.message.reply_text(
-        f"{WELCOME_MESSAGE} {update.effective_user.first_name}"
+        f"{update.effective_user.first_name}, {WELCOME_MESSAGE}"
     )
 
 
@@ -29,15 +29,15 @@ async def forward_to_group(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if forwarded_msg:
         # Store the user_id in the conversation context
         context.bot_data[str(forwarded_msg.message_id)] = update.effective_user.id
-        await update.message.reply_text(
-            "Your message has been forwarded. We'll get back to you soon!"
-        )
+        #await update.message.reply_text(
+        #    "Your message has been forwarded. We'll get back to you soon!"
+        #)
         logging.info(
             f"Forwarded message ID: {forwarded_msg.message_id} from user ID: {update.effective_user.id}"
         )
     else:
         await update.message.reply_text(
-            "Sorry, there was an error forwarding your message. Please try again later."
+            "Помилка при відправці повідомлення, спробуйте будь ласка ще. Якщо не допоможе, зв'яжіться з нами по контактам на сайті."
         )
 
 
@@ -56,20 +56,20 @@ async def forward_to_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     chat_id=user_id, text=update.message.text
                 )
                 await update.message.reply_text(
-                    "Message sent to the user successfully."
+                    "Повідомлення відправлено користувачу."
                 )
                 # Clean up the stored user_id
                 del context.bot_data[original_message_id]
             except Exception as e:
                 logging.error(f"Error sending message to user: {str(e)}")
                 await update.message.reply_text(
-                    f"Error sending message to user: {str(e)}"
+                    f"Помилка при відправці повідомлення користувачу: {str(e)}"
                 )
         else:
             logging.warning("Could not find the user to reply to.")
-            await update.message.reply_text("Could not find the user to reply to.")
+            await update.message.reply_text("Не можу знайти користувача для відповіді.")
     else:
         logging.warning("This message is not a reply to a forwarded message.")
         await update.message.reply_text(
-            "This message is not a reply to a forwarded message."
+            "Це повідомлення не є відповіддю на переслане повідомлення."
         )

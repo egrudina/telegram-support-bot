@@ -17,6 +17,8 @@ You need to specify these env variables to run this bot. If you run it locally, 
 ``` bash
 TELEGRAM_TOKEN=  # your bot's token
 TELEGRAM_SUPPORT_CHAT_ID=  # chat_id where the bot will forward all incoming messages
+FORWARD_MODE=support_chat # If you want to forward messages to chat
+PERSONAL_ACCOUNT_CHAT_ID= # Set your personal ID, without it app raises exception
 
 # optional params
 HEROKU_APP_NAME=  # name of your Heroku app for webhook setup
