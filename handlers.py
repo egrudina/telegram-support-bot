@@ -18,6 +18,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def forward_to_group(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Forward user messages to the support group or personal account."""
+    if not update.message:
+        return
     if FORWARD_MODE == "support_chat":
         forwarded_msg = await update.message.forward(TELEGRAM_SUPPORT_CHAT_ID)
     elif FORWARD_MODE == "personal_account":
