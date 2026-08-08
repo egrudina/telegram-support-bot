@@ -1,0 +1,21 @@
+# Secrets - .env is supplied at runtime via docker-compose env_file, never baked in
+.env
+.env.*
+
+# VCS and local noise
+.git
+.gitignore
+.DS_Store
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Docs and deploy metadata not needed in the image
+CLAUDE.md
+README.md
+LICENSE
+Procfile
+app.json
+Dockerfile
+docker-compose.yml

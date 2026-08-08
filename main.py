@@ -4,10 +4,18 @@ import signal
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 from handlers import start, forward_to_group, forward_to_user
+from error_handling import (
+    error_handler,
+    install_network_error_filter,
+    network_watchdog,
+)
 from settings import TELEGRAM_TOKEN, TELEGRAM_SUPPORT_CHAT_ID, PERSONAL_ACCOUNT_CHAT_ID
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
+
+# Retryable network errors become one-line WARNINGs; a real outage still raises ERROR.
+network_health = install_network_error_filter()
 
 # Create an event to signal when to stop the bot
 stop_event = asyncio.Event()
@@ -38,6 +46,8 @@ async def main():
         )
     )
 
+    application.add_error_handler(error_handler)
+
     logging.info("Handlers registered.")
 
     # Set up signal handlers
@@ -50,12 +60,17 @@ async def main():
     await application.start()
     await application.updater.start_polling(allowed_updates=Update.ALL_TYPES)
 
+    # Escalates to ERROR only if the API stays unreachable for several minutes
+    watchdog_task = asyncio.ensure_future(network_watchdog(network_health))
+
     logging.info("Bot started. Press Ctrl+C to stop.")
 
     # Wait until the stop event is set
     await stop_event.wait()
 
     # Stop the bot gracefully
+    watchdog_task.cancel()
+    await application.updater.stop()
     await application.stop()
     await application.shutdown()
 
@@ -67,5 +82,6 @@ async def shutdown(application: Application):
 
 
 if __name__ == "__main__":
-    #asyncio.run(main())
-    asyncio.get_event_loop().run_until_complete(main()) # For old Python, like 3.8.10
+    # asyncio.run() has existed since Python 3.7. get_event_loop() was deprecated in 3.10
+    # and raises RuntimeError from 3.14 on, so this is the only form that works everywhere.
+    asyncio.run(main())
